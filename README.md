@@ -30,12 +30,13 @@ Version Control        | Git, GitLab
 
 ## Architecture Diagram
 
+```
     +------------------+
     |   Client Browser |
     +--------+---------+
              |
     +--------v---------+
-    |   NGINX           |
+    |      NGINX        |
     |  Reverse Proxy    |
     |  Load Balancer    |
     +--+--+--+--+--+---+
@@ -60,10 +61,11 @@ Version Control        | Git, GitLab
           |   VPC, EKS, RDS, IAM   |
           +------------------------+
 
-    CI/CD Security Layer (GitLab CI)
-    ---------------------------------
-    Code Push --> SonarQube SAST --> Trivy Scan
-        --> Nexus Artifact Registry --> Deploy to EKS
+  CI/CD Security Layer (GitLab CI)
+  ---------------------------------
+  Code Push --> SonarQube SAST --> Trivy Scan
+           --> Nexus Artifact Registry --> Deploy to EKS
+```
 
 ---
 
@@ -128,32 +130,34 @@ Store all sensitive credentials (DB passwords, API keys) in AWS Secrets Manager 
 
 ### Pipeline Flow (GitLab CI)
 
-    Code Push to GitLab
-      |
-      v
-    GitLab CI Pipeline Triggered
-      |
-      +-- SonarQube SAST scan (Static Application Security Testing)
-      |     Fails pipeline if critical vulnerabilities found
-      |
-      +-- Docker image build
-      |
-      +-- Trivy container scan
-      |     Scans image for CVEs and misconfigurations
-      |     Fails pipeline on HIGH / CRITICAL findings
-      |
-      +-- Push verified image to Sonatype Nexus Docker Registry
-      |
-      +-- Update Helm chart values (image tag)
-      |
-      v
-    Helm deploy to Kubernetes (AWS EKS)
-      |
-      v
-    Rolling update — zero downtime release
-      |
-      v
-    Health checks via liveness & readiness probes
+```
+Code Push to GitLab
+  |
+  v
+GitLab CI Pipeline Triggered
+  |
+  +-- SonarQube SAST scan (Static Application Security Testing)
+  |     Fails pipeline if critical vulnerabilities found
+  |
+  +-- Docker image build
+  |
+  +-- Trivy container scan
+  |     Scans image for CVEs and misconfigurations
+  |     Fails pipeline on HIGH / CRITICAL findings
+  |
+  +-- Push verified image to Sonatype Nexus Docker Registry
+  |
+  +-- Update Helm chart values (image tag)
+  |
+  v
+Helm deploy to Kubernetes (AWS EKS)
+  |
+  v
+Rolling update — zero downtime release
+  |
+  v
+Health checks via liveness & readiness probes
+```
 
 ### Secrets Handling
 
